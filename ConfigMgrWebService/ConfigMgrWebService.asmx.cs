@@ -39,7 +39,7 @@ namespace SqlExtensions
 
 namespace ConfigMgrWebService
 {
-    [WebService(Name = "ConfigMgr WebService", Description = "Web service for ConfigMgr Current Branch developed by Nickolaj Andersen (1.8.0)", Namespace = "http://www.scconfigmgr.com")]
+    [WebService(Name = "ConfigMgr WebService", Description = "Web service for ConfigMgr Current Branch", Namespace = "http://www.scconfigmgr.com")]
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [System.ComponentModel.ToolboxItem(false)]
 
