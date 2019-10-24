@@ -6,7 +6,8 @@ The list below shows an overview of the available methods:
 
 ### Configuration Manager
 
-- AddCMComputerToCollection 
+- AddCMComputerToCollection
+- AddCMComputerToCollectionByResourceID
 - GetCMBootImageSourceVersion  
 - GetCMDeployedApplicationsByDevice 
 - GetCMDeployedApplicationsByUser 
