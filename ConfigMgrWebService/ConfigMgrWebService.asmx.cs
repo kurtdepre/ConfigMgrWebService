@@ -1296,6 +1296,70 @@ namespace ConfigMgrWebService
             return returnValue;
         }
 
+        [WebMethod(Description = "Add a computer to a specific device collection (creates a direct membership rule) Using the Computer ResourceID")]
+
+        public bool AddCMComputerToCollectionByResourceID(string secret, string ResourceID, string collectionId, string resourceName)
+        {
+            MethodBase method = MethodBase.GetCurrentMethod();
+            MethodBegin(method);
+
+            //' Variable for return value
+            bool returnValue = false;
+
+            //' Validate secret key
+            if (secret == secretKey)
+            {
+                //' Connect to SMS Provider
+                SmsProvider smsProvider = new SmsProvider();
+                WqlConnectionManager connection = smsProvider.Connect(siteServer);
+
+                //' Get resource id for given computer name
+                string resourceId = ResourceID;
+                if (!String.IsNullOrEmpty(resourceId))
+                {
+                    //' Initiate collection object
+                    WqlResultObject collection = null;
+
+                    //' Attempt to get collection
+                    string query = String.Format("SELECT * FROM SMS_Collection WHERE CollectionID LIKE '{0}' AND CollectionType = 2", collectionId);
+                    WqlQueryResultsObject collResult = (WqlQueryResultsObject)connection.QueryProcessor.ExecuteQuery(query);
+
+                    if (collResult != null)
+                    {
+                        foreach (WqlResultObject coll in collResult)
+                        {
+                            collection = coll;
+                        }
+
+                        //' Construct new direct membership rule
+                        IResultObject newRule = connection.CreateInstance("SMS_CollectionRuleDirect");
+                        newRule["ResourceClassName"].StringValue = "SMS_R_System";
+                        newRule["ResourceID"].StringValue = resourceId;
+                        newRule["RuleName"].StringValue = resourceName;
+
+                        //' Construct params dictionary for method execution
+                        Dictionary<string, object> methodParams = new Dictionary<string, object>();
+                        methodParams.Add("CollectionRule", newRule);
+
+                        //' Execute method to add new direct membership rule
+                        IResultObject result = collection.ExecuteMethod("AddMembershipRule", methodParams);
+
+                        //' Refresh collection
+                        if (result["ReturnValue"].IntegerValue == 0)
+                        {
+                            Dictionary<string, object> refreshParams = new Dictionary<string, object>();
+                            collection.ExecuteMethod("RequestRefresh", refreshParams);
+
+                            returnValue = true;
+                        }
+                    }
+                }
+            }
+
+            MethodEnd(method);
+            return returnValue;
+        }
+
         [WebMethod(Description = "Get all or a filtered list of device collections")]
         public List<CMCollection> GetCMDeviceCollections(string secret, string filter = null)
         {
